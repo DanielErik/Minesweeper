@@ -1,8 +1,12 @@
 import { useState } from "react";
-import "./App.css";
+import Board from "./Components/Board";
+
 
 function App() {
-  return <></>;
+  return <>
+    <Board />
+  
+  </>;
 }
 
 export default App;
