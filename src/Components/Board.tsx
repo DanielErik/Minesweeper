@@ -1,44 +1,37 @@
 import { Application, type Renderer } from "pixi.js";
 import { useEffect, useRef } from "react";
+import { pixiManager } from "../Pixi/PixiManager";
 
+function Board() {
+  const containerRef = useRef<HTMLDivElement>(null);
 
-function Board(){
+  useEffect(() => {
+    let destroyed = false;
+    const app = new Application<Renderer>();
 
-    const containerRef = useRef<HTMLDivElement>(null);
-    const appRef = useRef<Application | null>(null);
+    (async () => {
+      await app.init({
+        background: "#1099bb",
+        resizeTo: containerRef.current ?? undefined,
+      });
+      if (destroyed) {
+        app.destroy(true);
+        return;
+      }
 
-    useEffect(() => {
-        let destroyed = false;
-        const app = new Application<Renderer>();
+      pixiManager.setApp(app);
+      containerRef.current?.appendChild(app.canvas);
 
-        (async () => {
-            await app.init({
-                background: "#1099bb",
-                resizeTo: containerRef.current ?? undefined,
-            });
-            if(destroyed){
-                app.destroy(true);
-                return;
-            }
+      //Hier Board-Grid, Listener etc. einfügen
+    })();
 
-            appRef.current = app;
-            containerRef.current?.appendChild(app.view);
+    return () => {
+      destroyed = true;
+      pixiManager.destroy();
+    };
+  }, []);
 
-            //Hier Board-Grid, Listener etc. einfügen
-        })();
-
-        return () => {
-            destroyed = true;
-            appRef.current?.destroy(true, { children: true, texture: true });
-            appRef.current = null;
-        };
-
-
-    }, []);
-
-    return(
-        <div ref={containerRef} style={{ width: "600px", height: "600px" }} />
-    )
+  return <div ref={containerRef} style={{ width: "600px", height: "600px" }} />;
 }
 
 export default Board;
